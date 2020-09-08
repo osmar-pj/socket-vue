@@ -5,6 +5,7 @@ const io = require('socket.io')(server)
 const env = require('dotenv')
 const mongoose = require('mongoose')
 const router = express.Router()
+const cors = require('cors')
 
 //  MONGODB
 mongoose.connect('mongodb://localhost/prueba-db')
@@ -14,7 +15,9 @@ mongoose.connect('mongodb://localhost/prueba-db')
 // settings
 env.config()
 app.use(express.json())
+app.use(cors())
 app.use('/api', router)
+
 
 //require('./app/events/socket')(io)
 
@@ -57,6 +60,7 @@ router.get('/parametro', async (req, res) => {
 })
 
 router.post('/parametro', async (req, res) => {
+    console.log(req.body)
     const parametro = new Parametro(req.body)
     parametro.createdAt = new Date()
     await parametro.save()
@@ -69,3 +73,5 @@ router.post('/parametro', async (req, res) => {
 server.listen(process.env.SOCKET_PORT, () => {
     console.log(`server works in ${process.env.SOCKET_PORT}`)
 })
+
+//app.use(express.static(`${__dirname}/dist`))

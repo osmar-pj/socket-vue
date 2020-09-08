@@ -1,11 +1,19 @@
 <template>
   <div id="app" class="section">
-    <h1>HELLO WORLD</h1>
+    <h1>SOCKET</h1>
     <b-field label="Name">
-        <b-input v-model="parametro" type="number" size="0.01"></b-input>
+        <b-input v-model="form.temperature" type="number" size="0.01"></b-input>
     </b-field>
     <section>
         <b-button @click="sendParametro">Send</b-button>
+    </section>
+    <hr>
+    <h1>AXIOS</h1>
+    <b-field label="Name">
+        <b-input v-model="form.temperature" type="number" size="0.01"></b-input>
+    </b-field>
+    <section>
+        <b-button @click="sendAxios">Enviar</b-button>
     </section>
     <hr>
     <ul>
@@ -21,8 +29,14 @@ export default {
   methods: {
     sendParametro() {
       this.$socket.emit('send', ({
-        parametro: this.parametro
+        parametro: this.form.temperature
       }))
+    },
+    sendAxios() {
+      this.axios.post(`${this.baseURL}/api/parametro`, this.form)
+      .then(res => {
+        console.log(res.data)
+      })
     }
   },
   mounted() {
@@ -32,8 +46,12 @@ export default {
   },
   data() {
     return {
+      form: {
+        temperature: 0
+      },
       parametros: [],
-      parametro: ''
+      baseURL: `http://192.168.0.2:${process.env.VUE_APP_SOCKET_PORT}`,
+      //baseURL: `http://55d72a594f50.ngrok.io:3000`
     }
   }
 }
