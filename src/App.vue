@@ -1,57 +1,39 @@
 <template>
   <div id="app" class="section">
-    <h1>SOCKET</h1>
-    <b-field label="Name">
-        <b-input v-model="form.temperature" type="number" size="0.01"></b-input>
-    </b-field>
-    <section>
-        <b-button @click="sendParametro">Send</b-button>
-    </section>
-    <hr>
-    <h1>AXIOS</h1>
-    <b-field label="Name">
-        <b-input v-model="form.temperature" type="number" size="0.01"></b-input>
-    </b-field>
-    <section>
-        <b-button @click="sendAxios">Enviar</b-button>
-    </section>
-    <hr>
-    <ul>
-      <li v-for="temp in parametros" :key="temp.id">
-        {{ temp }}
-      </li>
-    </ul>
+    <h1 class="title">WELCOME OSMAR's HOUSE</h1>
+    <div class="field">
+        <b-switch v-model="form.ledStatus" @input="activeLed" type="is-warning">
+            ENCENDER PATIO DE CASA
+        </b-switch>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   methods: {
-    sendParametro() {
-      this.$socket.emit('send', ({
-        parametro: this.form.temperature
-      }))
-    },
-    sendAxios() {
-      this.axios.post(`${this.baseURL}/api/parametro`, this.form)
+    activeLed() {
+      this.axios.post(`${this.baseURL}/api/led`, this.form)
       .then(res => {
-        console.log(res.data)
+        this.form.ledStatus = res.data.status
       })
     }
   },
   mounted() {
-    this.$socket.on('update', (data) => {
-      this.parametros = data
+    this.$socket.on('led', (data) => {
+      this.form.ledStatus = data
     })
+    // this.$socket.on('led', (data) => {
+    //   this.form.ledStatus = data
+    // })
   },
   data() {
     return {
       form: {
-        temperature: 0
+        ledStatus: false
       },
-      parametros: [],
       baseURL: `http://192.168.0.2:${process.env.VUE_APP_SOCKET_PORT}`,
-      //baseURL: `http://55d72a594f50.ngrok.io:3000`
+      //baseURL: `http://osmarpj.com`
     }
   }
 }

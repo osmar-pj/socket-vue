@@ -12,7 +12,7 @@ Vue.use(Buefy)
 Vue.use(VueAxios, axios)
 
 Vue.prototype.$socket = io(`http://192.168.0.2:${process.env.VUE_APP_SOCKET_PORT}`)
-//Vue.prototype.$socket = io(`http://55d72a594f50.ngrok.io`)
+//Vue.prototype.$socket = io(`http://osmarpj.com`)
 
 new Vue({
   render: h => h(App),

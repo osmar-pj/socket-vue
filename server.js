@@ -22,6 +22,7 @@ app.use('/api', router)
 //require('./app/events/socket')(io)
 
 let parametros = []
+let socketLed = true
 let USERS = {}
 
 io.on('connection', (socket) => {
@@ -29,11 +30,7 @@ io.on('connection', (socket) => {
     console.log(`${socket.id} was connected`)
     USERS[socket.id] = socket
 
-    // send
-    socket.on('send', (data) => {
-        parametros.push(data)
-        console.log(parametros)
-    })
+    // escucha
 
     // disconnect
     socket.on('disconnect', () => {
@@ -44,7 +41,8 @@ io.on('connection', (socket) => {
 setInterval(() => {
     // TOOD SEND PACKAGE
     for (let i in USERS) {
-        USERS[i].emit('update', parametros)
+        //USERS[i].emit('temp', parametros)
+        USERS[i].emit('led', socketLed)
     }
     
 }, 1000 / 25)
@@ -53,20 +51,36 @@ setInterval(() => {
 //app.use('/api', require('./routes/api'))
 
 const Parametro = require('./app/models/Parametro')
+const Led = require('./app/models/Led')
 
 router.get('/parametro', async (req, res) => {
     const parametros = await Parametro.find()
     res.json(parametros)
 })
 
+router.get('/led', async (req, res) => {
+    const ledStatus = await Led.find().sort({_id:-1}).limit(1)
+    res.json(ledStatus[0].ledStatus)
+})
+
 router.post('/parametro', async (req, res) => {
-    console.log(req.body)
     const parametro = new Parametro(req.body)
     parametro.createdAt = new Date()
+    parametro.LedStatus = true
     await parametro.save()
     parametros.push(parametro.temperature)
     res.json({
-        status: 'parametro saved'
+        status: 'guardado'
+    })
+})
+
+router.post('/led', async (req, res) => {
+    const led = new Led(req.body)
+    led.createdAt = new Date()
+    socketLed = led.ledStatus
+    await led.save()
+    res.json({
+        status: led.ledStatus
     })
 })
 
