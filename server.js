@@ -8,7 +8,7 @@ const router = express.Router()
 const cors = require('cors')
 
 //  MONGODB
-mongoose.connect('mongodb://localhost/prueba-db')
+mongoose.connect('mongodb://localhost/prueba-db', { useNewUrlParser: true, useUnifiedTopology: true } )
     .then(db => console.log('DB is connected'))
     .catch(err => console.error(err))
 
@@ -21,8 +21,15 @@ app.use('/api', router)
 
 //require('./app/events/socket')(io)
 
-let parametros = []
-let socketLed = true
+let parametros = {
+    t: [],
+    h: [],
+    date: []
+}
+// const t = []
+// const h = []
+// const date = []
+let socketLed = false
 let USERS = {}
 
 io.on('connection', (socket) => {
@@ -41,11 +48,18 @@ io.on('connection', (socket) => {
 setInterval(() => {
     // TOOD SEND PACKAGE
     for (let i in USERS) {
-        //USERS[i].emit('temp', parametros)
         USERS[i].emit('led', socketLed)
     }
     
 }, 1000 / 25)
+
+setInterval(() => {
+    // TOOD SEND PACKAGE
+    for (let i in USERS) {
+        USERS[i].emit('params', parametros)
+    }
+    
+}, 5000)
 
 // ENDPOINTS
 //app.use('/api', require('./routes/api'))
@@ -54,7 +68,17 @@ const Parametro = require('./app/models/Parametro')
 const Led = require('./app/models/Led')
 
 router.get('/parametro', async (req, res) => {
-    const parametros = await Parametro.find()
+    parametros = {
+        t: [],
+        h: [],
+        date: []
+    }
+    const params = await Parametro.find().sort({_id:-1}).limit(10)
+    params.forEach(dato => {
+        parametros.t.push(dato.temperature)
+        parametros.h.push(dato.humidity)
+        parametros.date.push(dato.createdAt)
+    })
     res.json(parametros)
 })
 
@@ -66,11 +90,20 @@ router.get('/led', async (req, res) => {
 router.post('/parametro', async (req, res) => {
     const parametro = new Parametro(req.body)
     parametro.createdAt = new Date()
-    parametro.LedStatus = true
     await parametro.save()
-    parametros.push(parametro.temperature)
+    parametros = {
+        t: [],
+        h: [],
+        date: []
+    }
+    params = await Parametro.find().sort({_id:-1}).limit(10)
+    params.forEach(dato => {
+        parametros.t.push(dato.temperature)
+        parametros.h.push(dato.humidity)
+        parametros.date.push(dato.createdAt)
+    })
     res.json({
-        status: 'guardado'
+        status: 'saved'
     })
 })
 

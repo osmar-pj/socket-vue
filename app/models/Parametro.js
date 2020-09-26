@@ -3,6 +3,7 @@ const { Schema } = mongoose
 
 const Parametro = new Schema({
     temperature: Number,
+    humidity: Number,
     createdAt: Date
 })
 
