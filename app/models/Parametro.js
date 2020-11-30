@@ -2,7 +2,9 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const Parametro = new Schema({
-    temperature: Number,
+    puerta_peq: Number,
+    puerta_gra: Number,
+    pir: Number,
     createdAt: Date
 })
 

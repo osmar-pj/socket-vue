@@ -11,7 +11,7 @@ Vue.config.productionTip = false
 Vue.use(Buefy)
 Vue.use(VueAxios, axios)
 
-Vue.prototype.$socket = io(`http://192.168.0.2:${process.env.VUE_APP_SOCKET_PORT}`)
+Vue.prototype.$socket = io(`http://192.168.43.186:${process.env.VUE_APP_SOCKET_PORT}`)
 //Vue.prototype.$socket = io(`http://osmarpj.com`)
 
 new Vue({
